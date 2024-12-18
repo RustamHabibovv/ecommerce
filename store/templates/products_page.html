@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>Home - Products</title>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'products_page' %}" class="nav-logo">ShopEasy</a>
+            <ul class="nav-links">
+                {% if user.is_authenticated %}
+                    {% if user.is_seller %}
+                        <li><a href="{% url 'order_history' %}">Order History</a></li>
+                    {% else %}
+                        <li><a href="{% url 'cart_page' %}">My Cart</a></li>
+                        <li><a href="{% url 'liked_products' %}">Liked Products</a></li>
+                        <li><a href="{% url 'order_history' %}">My Orders</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1 class="page-title">Products</h1>
+        
+        <!-- Filters Section -->
+        <div class="filter-section">
+            <form method="get" class="filter-form">
+                <input type="text" name="search" placeholder="Search by name" value="{{ search_query }}">
+                <select name="category">
+                    <option value="">All Categories</option>
+                    {% for value, label in category_choices %}
+                        <option value="{{ value }}" {% if value == selected_category %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <input type="number" name="min_price" placeholder="Min Price" value="{{ min_price }}" step="0.01">
+                <input type="number" name="max_price" placeholder="Max Price" value="{{ max_price }}" step="0.01">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </form>
+        </div>
+
+        <!-- Products Section -->
+        <div class="products-grid">
+            {% if products %}
+                {% for product in products %}
+                    <div class="product-card">
+                        <img src="{% static 'images/default-product.jpg' %}" alt="{{ product.name }}" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-name">{{ product.name }}</h3>
+                            <p class="product-description">{{ product.description }}</p>
+                            <p class="product-price">Price: ${{ product.price }}</p>
+                            <p class="product-category">Category: {{ product.get_category_display }}</p>
+                            <p class="product-seller">Seller: {{ product.seller.username }}</p>
+                        </div>
+                        {% if user.is_authenticated and user.is_seller %}
+                            <div class="product-actions">
+                                <a href="{% url 'update_product' product.id %}" class="btn btn-edit">Edit</a>
+                                <a href="{% url 'delete_product' product.id %}" class="btn btn-delete">Delete</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-products">No products found matching your criteria.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import CustomUser
+from .models import Product
 
 def register_view(request):
     if request.method == 'POST':
@@ -63,3 +64,48 @@ from django.shortcuts import render
 def home_view(request):
     return render(request, 'home.html')
 
+def products_page(request):
+    from .models import Product
+
+    # Fetch all products
+    products = Product.objects.all()
+
+    # Fetch predefined category choices
+    category_choices = Product.CATEGORY_CHOICES
+
+    # Search functionality
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+
+    # Filter by category
+    selected_category = request.GET.get('category', '')
+    if selected_category:
+        products = products.filter(category=selected_category)
+
+    # Filter by price range
+    min_price = request.GET.get('min_price', '').strip()
+    max_price = request.GET.get('max_price', '').strip()
+    if min_price:
+        products = products.filter(price__gte=min_price)
+    if max_price:
+        products = products.filter(price__lte=max_price)
+
+    context = {
+        'products': products,
+        'category_choices': category_choices,  # Send predefined categories to the template
+        'selected_category': selected_category,  # For retaining selected filter
+        'search_query': search_query,  # For retaining search query
+        'min_price': min_price,  # For retaining min price
+        'max_price': max_price,  # For retaining max price
+    }
+    return render(request, 'products_page.html', context)
+
+def order_history(request):
+    return render(request, 'order_history.html', {'message': 'Order History Placeholder'})
+
+def liked_products(request):
+    return render(request, 'liked_products.html', {'message': 'Liked Products Placeholder'})
+
+def cart_page(request):
+    return render(request, 'cart_page.html', {'message': 'Cart Page Placeholder'})
