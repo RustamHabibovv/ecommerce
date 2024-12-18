@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <title>Register</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        {% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li style="color: red;">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <!-- Username Field -->
+            <input type="text" name="username" placeholder="Username" required>
+            
+            <!-- Email Field -->
+            <input type="email" name="email" placeholder="Email" required>
+            
+            <!-- Password Fields -->
+            <input type="password" name="password1" placeholder="Password" required>
+            <input type="password" name="password2" placeholder="Confirm Password" required>
+            
+            <!-- Role Field -->
+            <select name="role" required>
+                <option value="">Select Role</option>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+                <option value="moderator">Moderator</option>
+            </select>
+            
+            <!-- Submit Button -->
+            <button type="submit">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+</body>
+</html>
